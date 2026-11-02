@@ -186,6 +186,7 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
 
     // crude error indicator, leave both red LEDs on and return
     if (i == 0) {
+        Dbprintf(_RED_("FPGA INIT_B never rose after PROGRAM_B, download aborted"));
         LED_C_ON();
         LED_D_ON();
         return;
@@ -215,6 +216,7 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
     }
     // crude error indicator, leave both red LEDs on and return
     if (i == 0) {
+        Dbprintf(_RED_("FPGA DONE never rose after %d bytes, image rejected"), FpgaImageLen);
         LED_C_ON();
         LED_D_ON();
         return;
@@ -341,6 +343,13 @@ static void FpgaDownloadAndGoEx(int bitstream_target, bool keep_em) {
 
     // Send waiting time extension request as this will take a while
     send_wtx(FPGA_LOAD_WAIT_TIME);
+
+    // Quiet the running image before pulling PROGRAM_B: a reconfiguration
+    // started while the LF coil is being driven failed on a XC2S15 board.
+    if (downloaded_bitstream != FPGA_BITSTREAM_UNKNOWN) {
+        FpgaWriteConfWord(FPGA_MAJOR_MODE_OFF);
+        SpinDelay(10);
+    }
 
     bool verbose = (g_dbglevel > 3);
 
