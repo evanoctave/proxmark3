@@ -70,7 +70,7 @@ void gpio_fpga_download_setup(void) {
     AT91C_BASE_PIOA->PIO_PER =
         GPIO_FPGA_NINIT |
         GPIO_FPGA_DONE |
-#if defined XC3
+#if defined XC3 || defined FPGA_MODE_PINS_ON_SPI
         // ICopyX(3S100E) M2 & M3 PIO ENA
         GPIO_SPCK |
         GPIO_MOSI |
@@ -87,7 +87,7 @@ void gpio_fpga_download_setup(void) {
     AT91C_BASE_PIOA->PIO_OER =
         GPIO_FPGA_NPROGRAM |
         GPIO_FPGA_CCLK     |
-#if defined XC3
+#if defined XC3 || defined FPGA_MODE_PINS_ON_SPI
         // ICopyX(3S100E) M2 & M3 OUTPUT ENA
         GPIO_SPCK |
         GPIO_MOSI |

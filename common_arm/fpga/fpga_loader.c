@@ -167,8 +167,9 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
     // setup gpio function
     gpio_fpga_download_setup();
 
-#if defined XC3
+#if defined XC3 || defined FPGA_MODE_PINS_ON_SPI
     // ICopyX(3S100E) M2 & M3 OUTPUT HIGH, for 'Slave Serial' mode select.
+    // Experiment for clones wiring the Spartan-II mode pins the same way.
     Gpio_FPGA_XC3_M1_High();
     Gpio_FPGA_XC3_M2_High();
 #endif
@@ -231,6 +232,10 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
         LED_D_ON();
         return;
     }
+#if defined FPGA_MODE_PINS_ON_SPI
+    // mode pins sampled, give SPCK/MOSI back to the SPI peripheral
+    AT91C_BASE_PIOA->PIO_PDR = GPIO_SPCK | GPIO_MOSI;
+#endif
     LED_D_OFF();
 }
 
