@@ -77,8 +77,11 @@ Here are the supported values you can assign to `PLATFORM` in `Makefile.platform
 | PM3GENERIC      | Proxmark3 generic target      |
 | PM3ICOPYX       | iCopy-X with XC3S100E         |
 | PM3ULTIMATE     | Proxmark3 Ultimate with XC2S50 |
+| PM3XC2S15       | Proxmark3 generic with XC2S15 |
 
 By default `PLATFORM=PM3RDV4`.
+
+`PM3XC2S15` is for PM3 Easy style clones fitted with a Spartan-II XC2S15 instead of the XC2S30. That FPGA is less than half the size, so only two reduced images fit: LF reader/ADC (no LF simulation, Hitag or EM4x50) and HF reader + sniffer (no ISO14443A/MIFARE, HF simulation, FeliCa, ISO15693 2sc mode or `hf plot`).
 
 The MCU version (256 or 512) will be detected automatically during flashing.
 
