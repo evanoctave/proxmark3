@@ -702,6 +702,10 @@ message(STATUS "================================================================
 
 add_definitions(-DHAVE_SNPRINTF)
 
+if(PLATFORM STREQUAL "PM3XC2S15")
+    add_definitions("-DXC2S15")
+endif()
+
 add_library(pm3rrg_rdv4 SHARED
         ${PM3_ROOT}/client/src/proxmark3.c
         ${PM3_ROOT}/client/src/guidummy.cpp

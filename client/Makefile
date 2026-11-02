@@ -30,6 +30,10 @@ ifeq ($(PLATFORM),PM3ICOPYX)
   INCLUDES += -DICOPYX
 endif
 
+ifeq ($(PLATFORM),PM3XC2S15)
+  INCLUDES += -DXC2S15
+endif
+
 ifeq ($(PLATFORM),PM5)
   INCLUDES += -DDEFAULT_PM5
 endif
