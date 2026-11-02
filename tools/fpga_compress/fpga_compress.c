@@ -484,6 +484,31 @@ static void print_version_info_preamble(FILE *outfile, int num_infiles) {
     fprintf(outfile, "const FPGA_VERSION_INFORMATION g_fpga_version_information[%d] = {\n", num_infiles);
 }
 
+// The design name ends in the image role (fpga_pm3_lf, fpga_pm3_ult_lf,
+// fpga_pm3_s15_lf, ...), so match the suffix rather than the whole name.
+static const char *bitstream_target_name(const char *version_string) {
+    static const struct {
+        const char *suffix;
+        const char *target;
+    } roles[] = {
+        { "_hf_15", "FPGA_BITSTREAM_HF_15" },
+        { "_felica", "FPGA_BITSTREAM_HF_FELICA" },
+        { "_lf", "FPGA_BITSTREAM_LF" },
+        { "_hf", "FPGA_BITSTREAM_HF" },
+    };
+
+    const char *end = strstr(version_string, ".ncd");
+    size_t len = end ? (size_t)(end - version_string) : strlen(version_string);
+
+    for (size_t i = 0; i < sizeof(roles) / sizeof(roles[0]); i++) {
+        size_t slen = strlen(roles[i].suffix);
+        if (len >= slen && memcmp(version_string + len - slen, roles[i].suffix, slen) == 0) {
+            return roles[i].target;
+        }
+    }
+    return "FPGA_BITSTREAM_UNKNOWN";
+}
+
 static int generate_fpga_version_info(FILE *infile[], char *infile_names[], int num_infiles, FILE *outfile) {
 
     char version_string[80] = "";
@@ -493,17 +518,7 @@ static int generate_fpga_version_info(FILE *infile[], char *infile_names[], int 
     for (int i = 0; i < num_infiles; i++) {
         FpgaGatherVersion(infile[i], infile_names[i], version_string, sizeof(version_string));
         fprintf(outfile, "    { \"%s\"", version_string);
-
-        if (!memcmp("fpga_pm3_lf.ncd", version_string, sizeof("fpga_pm3_lf.ncd") - 1))
-            fprintf(outfile, ", FPGA_BITSTREAM_LF }");
-        else if (!memcmp("fpga_pm3_hf_15.ncd", version_string, sizeof("fpga_pm3_hf_15.ncd") - 1))
-            fprintf(outfile, ", FPGA_BITSTREAM_HF_15 }");
-        else if (!memcmp("fpga_pm3_hf.ncd", version_string, sizeof("fpga_pm3_hf.ncd") - 1))
-            fprintf(outfile, ", FPGA_BITSTREAM_HF }");
-        else if (!memcmp("fpga_pm3_felica.ncd", version_string, sizeof("fpga_pm3_felica.ncd") - 1))
-            fprintf(outfile, ", FPGA_BITSTREAM_HF_FELICA }");
-        else
-            fprintf(outfile, ", FPGA_BITSTREAM_UNKNOWN }");
+        fprintf(outfile, ", %s }", bitstream_target_name(version_string));
 
         if (i != num_infiles - 1) {
             fprintf(outfile, ",");
