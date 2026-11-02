@@ -30,6 +30,8 @@
 //`define PM3ICOPYX
 // Proxmark3 Ultimate with XC2S50
 //`define PM3ULTIMATE
+// Proxmark3 generic target with XC2S15
+//`define PM3XC2S15
 
 // Pass desired defines to compiler to enable required modules
 // WITH_LF  enables Low Frequency mode when defined else HF is enabled
