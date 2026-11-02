@@ -215,20 +215,21 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
 
     // continue to clock FPGA until ready signal goes high
     i = 100000;
-    while ((i--) && (!Gpio_FPGA_DONE_Read())) {
+    while ((i > 0) && (!Gpio_FPGA_DONE_Read())) {
         Gpio_FPGA_CCLK_High();
         Gpio_FPGA_CCLK_Low();
-    }
-    // crude error indicator, leave both red LEDs on and return
-    if (i == 0) {
-        Dbprintf(_RED_("FPGA DONE never rose after %d bytes, image rejected"), FpgaImageLen);
-        LED_C_ON();
-        LED_D_ON();
-        return;
+        i--;
     }
     if (g_dbglevel >= DBG_DEBUG) {
         Dbprintf("FPGA cfg: %d bytes, during PROGRAM_B low DONE=%d INIT_B=%d, INIT_B wait %d, DONE after %d extra CCLK, INIT_B now %d",
-                 FpgaImageLen, done_during_program, init_during_program, init_wait, 100000 - 1 - i, Gpio_FPGA_NINIT_Read());
+                 FpgaImageLen, done_during_program, init_during_program, init_wait, 100000 - i, Gpio_FPGA_NINIT_Read());
+    }
+    // crude error indicator, leave both red LEDs on and return
+    if (i == 0) {
+        Dbprintf(_RED_("FPGA DONE never rose after %d bytes, image rejected (INIT_B=%d)"), FpgaImageLen, Gpio_FPGA_NINIT_Read());
+        LED_C_ON();
+        LED_D_ON();
+        return;
     }
     LED_D_OFF();
 }
