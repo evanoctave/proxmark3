@@ -18,6 +18,10 @@ PLATFORM=PM3RDV4
 # uncomment the line below
 #PLATFORM=PM3ULTIMATE
 
+# For PM3 Easy style clones fitted with a XC2S15 FPGA:
+# uncomment the line below
+#PLATFORM=PM3XC2S15
+
 # For Proxmark5 (PM5, Artery AT32F435/437):
 # uncomment the line below
 #PLATFORM=PM5

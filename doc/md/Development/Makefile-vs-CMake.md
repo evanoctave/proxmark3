@@ -114,7 +114,7 @@ At the moment both are maintained because they don't perfectly overlap yet.
 
 | Feature | Makefile | Remarks |
 |-----|---|---|
-| Platform choice | `PLATFORM=` | values: `PM3RDV4`, `PM3GENERIC`, `PM3ICOPYX`, `PM3ULTIMATE` |
+| Platform choice | `PLATFORM=` | values: `PM3RDV4`, `PM3GENERIC`, `PM3ICOPYX`, `PM3ULTIMATE`, `PM3XC2S15` |
 | Platform size | `PLATFORM_SIZE=` | values: `256`, `512` |
 | Platform extras | `PLATFORM_EXTRAS=` | values: `BTADDON`, `FPC_USART_DEV` |
 | Skip LF/HF techs in the firmware | `SKIP_`*`=1` | see `common_arm/Makefile.hal` for a list |

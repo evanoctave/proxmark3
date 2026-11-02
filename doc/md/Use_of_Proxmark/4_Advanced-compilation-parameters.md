@@ -77,6 +77,7 @@ Here are the supported values you can assign to `PLATFORM` in `Makefile.platform
 | PM3GENERIC      | Proxmark3 generic target      |
 | PM3ICOPYX       | iCopy-X with XC3S100E         |
 | PM3ULTIMATE     | Proxmark3 Ultimate with XC2S50 |
+| PM3XC2S15       | Proxmark3 generic with XC2S15 |
 
 By default `PLATFORM=PM3RDV4`.
 
