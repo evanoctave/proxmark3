@@ -9,7 +9,7 @@
 #   make            - every PM3 image
 #   make pm3        - same
 #   make pm5        - the PM5 bitstream
-#   make <target>   - routed by name, e.g. fpga_pm3_hf, fpga_pm3_ult_lf, fpga_pm5
+#   make <target>   - routed by name, e.g. fpga_pm3_hf, fpga_pm3_ult_lf, fpga_pm3_s15_lf, fpga_pm5
 #   make clean      - both platforms
 #   make help       - both target lists
 #

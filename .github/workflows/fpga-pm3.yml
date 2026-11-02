@@ -59,7 +59,8 @@ jobs:
           # target of their own and stay empty; the rest must have content
           for t in fpga_pm3_lf fpga_pm3_hf fpga_pm3_hf_15 fpga_pm3_felica \
                    fpga_pm3_ult_lf fpga_pm3_ult_hf fpga_pm3_ult_hf_15 \
-                   fpga_pm3_ult_felica fpga_icopyx_hf; do
+                   fpga_pm3_ult_felica fpga_pm3_s15_lf fpga_pm3_s15_hf \
+                   fpga_pm3_s15_hf_15 fpga_pm3_s15_felica fpga_icopyx_hf; do
             size=$(stat -c%s "fpga/$t.bit")
             echo "fpga/$t.bit ${size} bytes"
             test "$size" -gt 1000
