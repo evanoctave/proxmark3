@@ -151,3 +151,131 @@ TARGET11_FILES = $(TARGET1_FILES)
 # List of all valid target FPGA images to build
 TARGETS = $(TARGET1_NAME) $(TARGET2_NAME) $(TARGET3_NAME) $(TARGET4_NAME) $(TARGET5_NAME) $(TARGET6_NAME) $(TARGET7_NAME) $(TARGET8_NAME) $(TARGET9_NAME) $(TARGET10_NAME) $(TARGET11_NAME)
 
+#  Verbosity type for ISE tools ise|xflow|silent
+VERBOSITY = -intstyle silent
+
+# Pass the custom variables to the lower make rules
+$(TARGET1_NAME).bit: TARGET_FPGA = $(TARGET1_FPGA)
+$(TARGET1_NAME).bit: TARGET_UCF = $(TARGET1_UCF)
+$(TARGET1_NAME).bit: TARGET_FILES = $(TARGET1_FILES)
+$(TARGET1_NAME).bit: TARGET_XST_OPTS = $(TARGET1_XST_OPTS)
+
+$(TARGET2_NAME).bit: TARGET_FPGA = $(TARGET2_FPGA)
+$(TARGET2_NAME).bit: TARGET_UCF = $(TARGET2_UCF)
+$(TARGET2_NAME).bit: TARGET_FILES = $(TARGET2_FILES)
+$(TARGET2_NAME).bit: TARGET_XST_OPTS = $(TARGET2_XST_OPTS)
+
+$(TARGET3_NAME).bit: TARGET_FPGA = $(TARGET3_FPGA)
+$(TARGET3_NAME).bit: TARGET_UCF = $(TARGET3_UCF)
+$(TARGET3_NAME).bit: TARGET_FILES = $(TARGET3_FILES)
+$(TARGET3_NAME).bit: TARGET_XST_OPTS = $(TARGET3_XST_OPTS)
+
+$(TARGET4_NAME).bit: TARGET_FPGA = $(TARGET4_FPGA)
+$(TARGET4_NAME).bit: TARGET_UCF = $(TARGET4_UCF)
+$(TARGET4_NAME).bit: TARGET_FILES = $(TARGET4_FILES)
+$(TARGET4_NAME).bit: TARGET_XST_OPTS = $(TARGET4_XST_OPTS)
+
+$(TARGET5_NAME).bit: TARGET_FPGA = $(TARGET5_FPGA)
+$(TARGET5_NAME).bit: TARGET_UCF = $(TARGET5_UCF)
+$(TARGET5_NAME).bit: TARGET_FILES = $(TARGET5_FILES)
+$(TARGET5_NAME).bit: TARGET_XST_OPTS = $(TARGET5_XST_OPTS)
+
+$(TARGET6_NAME).bit: TARGET_FPGA = $(TARGET6_FPGA)
+$(TARGET6_NAME).bit: TARGET_UCF = $(TARGET6_UCF)
+$(TARGET6_NAME).bit: TARGET_FILES = $(TARGET6_FILES)
+$(TARGET6_NAME).bit: TARGET_XST_OPTS = $(TARGET6_XST_OPTS)
+
+$(TARGET7_NAME).bit: TARGET_FPGA = $(TARGET7_FPGA)
+$(TARGET7_NAME).bit: TARGET_UCF = $(TARGET7_UCF)
+$(TARGET7_NAME).bit: TARGET_FILES = $(TARGET7_FILES)
+$(TARGET7_NAME).bit: TARGET_XST_OPTS = $(TARGET7_XST_OPTS)
+
+$(TARGET8_NAME).bit: TARGET_FPGA = $(TARGET8_FPGA)
+$(TARGET8_NAME).bit: TARGET_UCF = $(TARGET8_UCF)
+$(TARGET8_NAME).bit: TARGET_FILES = $(TARGET8_FILES)
+$(TARGET8_NAME).bit: TARGET_XST_OPTS = $(TARGET8_XST_OPTS)
+
+$(TARGET9_NAME).bit: TARGET_FPGA = $(TARGET9_FPGA)
+$(TARGET9_NAME).bit: TARGET_UCF = $(TARGET9_UCF)
+$(TARGET9_NAME).bit: TARGET_FILES = $(TARGET9_FILES)
+$(TARGET9_NAME).bit: TARGET_XST_OPTS = $(TARGET9_XST_OPTS)
+
+$(TARGET10_NAME).bit: TARGET_FPGA = $(TARGET10_FPGA)
+$(TARGET10_NAME).bit: TARGET_UCF = $(TARGET10_UCF)
+$(TARGET10_NAME).bit: TARGET_FILES = $(TARGET10_FILES)
+$(TARGET10_NAME).bit: TARGET_XST_OPTS = $(TARGET10_XST_OPTS)
+
+$(TARGET11_NAME).bit: TARGET_FPGA = $(TARGET11_FPGA)
+$(TARGET11_NAME).bit: TARGET_UCF = $(TARGET11_UCF)
+$(TARGET11_NAME).bit: TARGET_FILES = $(TARGET11_FILES)
+$(TARGET11_NAME).bit: TARGET_XST_OPTS = $(TARGET11_XST_OPTS)
+
+$(TARGETS):
+	$(Q)$(MKDIR) $(PREFIX)build_$@
+	$(Q)$(MAKE) -C $(PREFIX)build_$@ -f ../proxmark3_fpga.mk $(notdir $@).bit
+
+work:
+	$(Q)$(RM) xst.prj
+	$(Q)for item in $(TARGET_FILES); do echo verilog work ../$$item>>xst.prj; done
+	$(Q)echo work> xst.lso
+
+%.xst: work
+	$(Q)$(RM) $@
+	$(Q)echo $(TARGET_XST_OPTS)> $@
+
+%.ngc: %.xst
+	$(Q)$(RM) $@
+	$(info [-] XST $@)
+	$(Q)$(XILINX_TOOLS_PREFIX)xst $(VERBOSITY) -ifn $<
+
+%.ngd: %.ngc
+	$(Q)$(RM) $@
+	$(info [-] NGD $@)
+	$(Q)$(XILINX_TOOLS_PREFIX)ngdbuild $(VERBOSITY) -quiet -p $(TARGET_FPGA) -nt timestamp -uc ../$(TARGET_UCF) $< $@
+
+%_map.ncd: %.ngd
+	$(Q)$(RM) $@
+	$(info [-] MAP $@)
+	$(Q)$(XILINX_TOOLS_PREFIX)map $(VERBOSITY) -p $(TARGET_FPGA) -o $*_map $*
+
+%.ncd: %_map.ncd
+	$(Q)$(RM) $@
+	$(info [-] PAR $@)
+	$(Q)$(XILINX_TOOLS_PREFIX)par $(PAR_OPTIONS) $(VERBOSITY) -w $< $@
+
+%.bit: %.ncd
+	$(Q)$(RM) $@ $*.drc $*.rbt
+	$(info [=] BITGEN $@)
+	$(Q)$(XILINX_TOOLS_PREFIX)bitgen $(VERBOSITY) -w $* $@
+	$(Q)python3 ../$(STRIP_DATE_TIME) $@ || true
+	$(Q)$(CP) $@ ..
+
+# Build all targets
+all: $(TARGETS)
+
+# ALWAYS have some hardcoded text after $(PREFIX) to avoid rm -rf * or rm -rf /* situations if PREFIX is incorrectly set to empty "" or just "/"
+clean:
+	$(Q)$(RMDIR) $(PREFIX)build_*
+	$(info [-] Build files deleted)
+
+.DEFAULT:
+	@if [ "$@" != "all" ] && [ ! "$(filter $@,$(TARGETS))" ]; then \
+		make help; \
+	else \
+		make all; \
+	fi
+
+.PHONY: all help clean
+
+help:
+	@echo "################################################################"
+	@echo "#"
+	@echo "#   <target> - Builds only one of the above listed targets"
+	@echo "#   all      - Builds the FPGA bitstreams for all targets"
+	@echo "#   clean    - Keeps .bit files but cleans intermediate build files for all targets"
+	@echo "#"
+	@echo "#"
+	@echo "# Valid targets are:"
+	@echo "#   $(TARGETS)"
+	@echo "#"
+	@echo "################################################################"
