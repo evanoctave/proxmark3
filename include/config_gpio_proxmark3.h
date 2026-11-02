@@ -74,8 +74,14 @@
 #endif
 #define GPIO_FPGA_DONE      AT91C_PIO_PA27
 #define GPIO_FPGA_NPROGRAM  AT91C_PIO_PA28
+#if defined FPGA_SWAP_DIN_CCLK
+// experiment for clones with the two config lines crossed
+#define GPIO_FPGA_CCLK      AT91C_PIO_PA30
+#define GPIO_FPGA_DIN       AT91C_PIO_PA29
+#else
 #define GPIO_FPGA_CCLK      AT91C_PIO_PA29
 #define GPIO_FPGA_DIN       AT91C_PIO_PA30
+#endif
 #define GPIO_FPGA_DOUT      AT91C_PIO_PA31
 
 #endif // CONFIG_GPIO_PROXMARK3_H_
