@@ -48,7 +48,7 @@ jobs:
             # bitstreams back out over the checked out ones.
             rm -rf /build && mkdir /build && cp -r /src/fpga/. /build/
             cd /build
-            make all -j"$(nproc)"
+            make -k all -j"$(nproc)" VERBOSITY=
             cp *.bit /src/fpga/
           '
 
