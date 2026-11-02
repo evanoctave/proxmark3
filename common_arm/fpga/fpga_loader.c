@@ -152,7 +152,12 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
 
 #if !defined XC3 && !defined PM5
     gpio_fpga_on_setup();
+#if defined FPGA_ON_ACTIVE_LOW
+    // experiment for clones with an active low FPGA supply enable
+    Gpio_FPGA_ON_Low();
+#else
     Gpio_FPGA_ON_High(); // ensure everything is powered on
+#endif
 #endif
 
     SpinDelay(50);

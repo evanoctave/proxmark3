@@ -214,6 +214,9 @@ else ifeq ($(PLATFORM),PM3XC2S15)
     ifeq ($(FPGA_SWAP_DIN_CCLK),1)
         PLATFORM_DEFS += -DFPGA_SWAP_DIN_CCLK
     endif
+    ifeq ($(FPGA_ON_ACTIVE_LOW),1)
+        PLATFORM_DEFS += -DFPGA_ON_ACTIVE_LOW
+    endif
 else ifeq ($(PLATFORM),PM5)
     # TODO DXL 我们暂时不需要指定FPGA比特流文件，因为实际上我们大概率要做FPGA的静态烧录，而不是附加到ARM固件中动态下载
     FPGA_BITSTREAMS = fpga_pm3_hf.bit # TODO DXL 虽然可以不把打包比特流，但是还是得把FPGA的版本信息给生成，让EXE依赖。
