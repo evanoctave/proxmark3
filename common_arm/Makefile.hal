@@ -40,6 +40,8 @@ Known definitions:
 +--------------------------------------------------+
 | PM3ULTIMATE     | Proxmark3 Ultimate with XC2S50 |
 +--------------------------------------------------+
+| PM3XC2S15       | Proxmark3 generic with XC2S15  |
++--------------------------------------------------+
 | PM5             | Proxmark5 ICEMAN Edition       |
 +--------------------------------------------------+
 
@@ -185,6 +187,26 @@ else ifeq ($(PLATFORM),PM3ULTIMATE)
     PLATFORM_DEFS = -DWITH_FLASH -DXC2S50 -DCHIP_AT91SAM7S
     PLTNAME = Proxmark3 Ultimate with XC2S50
     PLATFORM_FPGA = xc2s50
+else ifeq ($(PLATFORM),PM3XC2S15)
+    # PM3 generic layout with a XC2S15 in the same VQ100 footprint.
+    # The XC2S15 only fits two reduced images, see fpga/proxmark3_fpga.mk:
+    # LF without edge detect (no LF sim, Hitag, EM4x50) and HF reader + sniffer
+    # (no ISO14443A, HF sim, FeliCa, ISO15693 2sc, trace).  Requests for the
+    # missing HF_15 / FELICA images fall back to the HF image.
+    FPGA_BITSTREAMS = fpga_pm3_s15_hf.bit
+    ifneq ($(SKIP_LF),1)
+        FPGA_BITSTREAMS += fpga_pm3_s15_lf.bit
+    endif
+    SKIP_HITAG = 1
+    SKIP_EM4x50 = 1
+    SKIP_FELICA = 1
+    SKIP_HFPLOT = 1
+    PLATFORM_DEFS = -DXC2S15 -DCHIP_AT91SAM7S
+    PLTNAME = Proxmark3 generic target with XC2S15
+    PLATFORM_FPGA = xc2s15
+    ifeq ($(LED_ORDER),PM3EASY)
+        PLATFORM_DEFS += -DLED_ORDER_PM3EASY
+    endif
 else ifeq ($(PLATFORM),PM5)
     # TODO DXL 我们暂时不需要指定FPGA比特流文件，因为实际上我们大概率要做FPGA的静态烧录，而不是附加到ARM固件中动态下载
     FPGA_BITSTREAMS = fpga_pm3_hf.bit # TODO DXL 虽然可以不把打包比特流，但是还是得把FPGA的版本信息给生成，让EXE依赖。

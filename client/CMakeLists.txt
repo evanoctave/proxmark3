@@ -590,6 +590,10 @@ if(PLATFORM STREQUAL "PM5")
     add_definitions("-DDEFAULT_PM5")
 endif()
 
+if(PLATFORM STREQUAL "PM3XC2S15")
+    add_definitions("-DXC2S15")
+endif()
+
 if ((NOT SKIPQT EQUAL 1) AND (Qt5_FOUND OR Qt6_FOUND))
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTORCC ON)

@@ -16,6 +16,8 @@ ifeq ($(PLATFORM),PM3ICOPYX)
   MYDEFS = -DXC3
 else ifeq ($(PLATFORM),PM3ULTIMATE)
   MYDEFS = -DXC2S50
+else ifeq ($(PLATFORM),PM3XC2S15)
+  MYDEFS = -DXC2S15
 else
   MYDEFS =
 endif

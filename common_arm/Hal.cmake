@@ -60,6 +60,26 @@ elseif (PLATFORM STREQUAL "PM3ICOPYX")
     set(PLATFORM_DEFS -DWITH_FLASH -DICOPYX -DXC3 -DCHIP_AT91SAM7S)
     set(PLTNAME "iCopy-X with XC3S100E")
     set(PLATFORM_FPGA "xc3s100e")
+elseif (PLATFORM STREQUAL "PM3XC2S15")
+    # PM3 generic layout with a XC2S15 in the same VQ100 footprint.
+    # The XC2S15 only fits two reduced images, see fpga/proxmark3_fpga.mk:
+    # LF without edge detect (no LF sim, Hitag, EM4x50) and HF reader + sniffer
+    # (no ISO14443A, HF sim, FeliCa, ISO15693 2sc, trace).  Requests for the
+    # missing HF_15 / FELICA images fall back to the HF image.
+    set(FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_hf.bit)
+    if (NOT SKIP_LF)
+        list(APPEND FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_lf.bit)
+    endif ()
+    set(SKIP_HITAG TRUE)
+    set(SKIP_EM4x50 TRUE)
+    set(SKIP_FELICA TRUE)
+    set(SKIP_HFPLOT TRUE)
+    set(PLATFORM_DEFS -DXC2S15 -DCHIP_AT91SAM7S)
+    set(PLTNAME "Proxmark3 generic target with XC2S15")
+    set(PLATFORM_FPGA "xc2s15")
+    if (LED_ORDER STREQUAL "PM3EASY")
+        list(APPEND PLATFORM_DEFS -DLED_ORDER_PM3EASY)
+    endif ()
 elseif (PLATFORM STREQUAL "PM5")
     # TODO DXL 我们暂时不需要指定FPGA比特流文件，因为实际上我们大概率要做FPGA的静态烧录，而不是附加到ARM固件中动态下载
     set(FPGA_BITSTREAMS ../fpga/fpga_pm3_hf.bit) # TODO DXL 虽然可以不把打包比特流，但是还是得把FPGA的版本信息给生成，让EXE依赖。
@@ -70,7 +90,7 @@ elseif (PLATFORM STREQUAL "PM5")
     set(PLATFORM_FPGA "GW1NR-LV2MG49GC6/i5")
     set(PM5 TRUE)
 else ()
-    message(FATAL_ERROR "Invalid or empty PLATFORM: ${PLATFORM}. Known platforms: PM3RDV4, PM3GENERIC, PM3ICOPYX (PM3OTHER is deprecated)")
+    message(FATAL_ERROR "Invalid or empty PLATFORM: ${PLATFORM}. Known platforms: PM3RDV4, PM3GENERIC, PM3ICOPYX, PM3XC2S15, PM5 (PM3OTHER is deprecated)")
 endif ()
 
 # PM3GENERIC and PM3OTHER
