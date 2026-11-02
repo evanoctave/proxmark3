@@ -72,10 +72,12 @@ If MAP reports the design does not fit:
   `PLATFORM_FPGA = xc2s15`. Row in the `KNOWN_PLATFORM_DEFINITIONS` table.
 - `common_arm/Hal.cmake`: equivalent block.
 - `tools/fpga_compress/Makefile`: `MYDEFS = -DXC2S15` for the platform.
-- Client: `cmdhw.c` compares the reported version string against
-  `FPGA_TYPE`. Mirror whatever mechanism feeds `XC3`/`XC2S50` to the client
-  build; if none exists today, note it and leave the check as is (it only
-  prints a mismatch warning).
+- Client: `cmdhw.c` (`hw version`) compares the reported version string
+  against `FPGA_TYPE` and prints "chip mismatch" otherwise. The client build
+  only ever receives `-DICOPYX` today, so iCopy-X and Ultimate already get a
+  false mismatch (pre-existing, not fixed here). For `PM3XC2S15` add
+  `-DXC2S15` in `client/Makefile`, `client/CMakeLists.txt` and
+  `client/experimental_lib/CMakeLists.txt` when `PLATFORM=PM3XC2S15`.
 
 ### Documentation
 
