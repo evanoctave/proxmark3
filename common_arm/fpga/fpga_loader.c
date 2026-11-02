@@ -176,6 +176,10 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
     // enter FPGA configuration mode
     Gpio_FPGA_NPROGRAM_Low();
     SpinDelay(50);
+    // DONE must be low here. Reading high means the pin is not wired to the
+    // FPGA (ARM pull-up), so the DONE wait below proves nothing.
+    bool done_during_program = Gpio_FPGA_DONE_Read();
+    bool init_during_program = Gpio_FPGA_NINIT_Read();
     Gpio_FPGA_NPROGRAM_High();
 
     i = 100000;
@@ -183,6 +187,7 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
     while ((i) && (!Gpio_FPGA_NINIT_Read())) {
         i--;
     }
+    int init_wait = 100000 - i;
 
     // crude error indicator, leave both red LEDs on and return
     if (i == 0) {
@@ -220,6 +225,10 @@ static void DownloadFPGA(int bitstream_target, int FpgaImageLen, lz4_streamp_t c
         LED_C_ON();
         LED_D_ON();
         return;
+    }
+    if (g_dbglevel >= DBG_DEBUG) {
+        Dbprintf("FPGA cfg: %d bytes, during PROGRAM_B low DONE=%d INIT_B=%d, INIT_B wait %d, DONE after %d extra CCLK, INIT_B now %d",
+                 FpgaImageLen, done_during_program, init_during_program, init_wait, 100000 - 1 - i, Gpio_FPGA_NINIT_Read());
     }
     LED_D_OFF();
 }
