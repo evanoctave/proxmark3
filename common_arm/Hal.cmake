@@ -61,17 +61,19 @@ elseif (PLATFORM STREQUAL "PM3ICOPYX")
     set(PLTNAME "iCopy-X with XC3S100E")
     set(PLATFORM_FPGA "xc3s100e")
 elseif (PLATFORM STREQUAL "PM3XC2S15")
-    # PM3 generic layout with a XC2S15 in the same VQ100 footprint
+    # PM3 generic layout with a XC2S15 in the same VQ100 footprint.
+    # The XC2S15 only fits two reduced images, see fpga/proxmark3_fpga.mk:
+    # LF without edge detect (no LF sim, Hitag, EM4x50) and HF reader + sniffer
+    # (no ISO14443A, HF sim, FeliCa, ISO15693 2sc, trace).  Requests for the
+    # missing HF_15 / FELICA images fall back to the HF image.
     set(FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_hf.bit)
     if (NOT SKIP_LF)
         list(APPEND FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_lf.bit)
     endif ()
-    if (NOT SKIP_FELICA)
-        list(APPEND FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_felica.bit)
-    endif ()
-    if (NOT SKIP_ISO15693)
-        list(APPEND FPGA_BITSTREAMS ../fpga/fpga_pm3_s15_hf_15.bit)
-    endif ()
+    set(SKIP_HITAG TRUE)
+    set(SKIP_EM4x50 TRUE)
+    set(SKIP_FELICA TRUE)
+    set(SKIP_HFPLOT TRUE)
     set(PLATFORM_DEFS -DXC2S15 -DCHIP_AT91SAM7S)
     set(PLTNAME "Proxmark3 generic target with XC2S15")
     set(PLATFORM_FPGA "xc2s15")

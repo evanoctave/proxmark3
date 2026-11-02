@@ -110,3 +110,24 @@ If MAP reports the design does not fit:
   error.
 - On device: flash, `hw status` shows FPGA image strings containing
   `2s15vq100`, `lf search` / `hf search` exercised by the user.
+
+## Outcome of synthesis (2026-11-01)
+
+Measured on CI (XC2S15 = 192 slices, 384 LUTs, 4 block RAMs):
+
+| Image / module | Slices |
+|---|---|
+| stock LF | 328 |
+| stock HF / HF_15 / FeliCa | 749 to 778 |
+| `lo_edge_detect` alone | 297 |
+| LF reader + passthru + ADC | 56 |
+| `hi_reader` + `hi_sniffer` | 169 |
+| `hi_iso14443a` alone | 194 |
+| `hi_flite` alone | 178 |
+
+Decision: ship two images, `fpga_pm3_s15_lf` (LF0, LF2, LF3) and
+`fpga_pm3_s15_hf` (HF0, HF3). The platform forces `SKIP_HITAG`,
+`SKIP_EM4x50`, `SKIP_FELICA` and `SKIP_HFPLOT`. ISO15693 keeps the basic
+reader through the HF image (a missing `HF_15` bitstream maps to index 0).
+Possible follow-ups: a trimmed `hi_iso14443a` image with ARM side image
+switching by major mode, and a FeliCa only image.

@@ -188,17 +188,19 @@ else ifeq ($(PLATFORM),PM3ULTIMATE)
     PLTNAME = Proxmark3 Ultimate with XC2S50
     PLATFORM_FPGA = xc2s50
 else ifeq ($(PLATFORM),PM3XC2S15)
-    # PM3 generic layout with a XC2S15 in the same VQ100 footprint
+    # PM3 generic layout with a XC2S15 in the same VQ100 footprint.
+    # The XC2S15 only fits two reduced images, see fpga/proxmark3_fpga.mk:
+    # LF without edge detect (no LF sim, Hitag, EM4x50) and HF reader + sniffer
+    # (no ISO14443A, HF sim, FeliCa, ISO15693 2sc, trace).  Requests for the
+    # missing HF_15 / FELICA images fall back to the HF image.
     FPGA_BITSTREAMS = fpga_pm3_s15_hf.bit
     ifneq ($(SKIP_LF),1)
         FPGA_BITSTREAMS += fpga_pm3_s15_lf.bit
     endif
-    ifneq ($(SKIP_FELICA),1)
-        FPGA_BITSTREAMS += fpga_pm3_s15_felica.bit
-    endif
-    ifneq ($(SKIP_ISO15693),1)
-        FPGA_BITSTREAMS += fpga_pm3_s15_hf_15.bit
-    endif
+    SKIP_HITAG = 1
+    SKIP_EM4x50 = 1
+    SKIP_FELICA = 1
+    SKIP_HFPLOT = 1
     PLATFORM_DEFS = -DXC2S15 -DCHIP_AT91SAM7S
     PLTNAME = Proxmark3 generic target with XC2S15
     PLATFORM_FPGA = xc2s15
